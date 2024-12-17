@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Notas</title>
+</head>
+<body>
+    <h1>Registro de Notas e Matrículas</h1>
+
+    <!-- Formulário para Matricular Estudante -->
+    <div>
+        <h3>Matricular Estudante</h3>
+        <label for="matricula">Matrícula:</label>
+        <input type="number" id="matricula"><br>
+
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome"><br>
+
+        <label for="curso">Curso:</label>
+        <select id="curso">
+            <option value="INT_INFO">Técnico Integrado em Informática</option>
+            <option value="INT_MECA">Técnico Integrado em Mecatrônica</option>
+            <option value="SUB_REDES">Técnico Subsequente em Redes</option>
+        </select><br>
+
+        <label for="periodo">Período:</label>
+        <input type="number" id="periodo" min="1" max="9"><br>
+
+        <button onclick="matricularEstudante()">Matricular Estudante</button>
+    </div>
+
+    <!-- Formulário para Registrar Notas -->
+    <div>
+        <h3>Registrar Notas</h3>
+        <label for="matriculaNota">Matrícula do Estudante:</label>
+        <input type="number" id="matriculaNota"><br>
+
+        <label for="b1">Nota 1:</label>
+        <input type="number" id="b1"><br>
+
+        <label for="b2">Nota 2:</label>
+        <input type="number" id="b2"><br>
+
+        <label for="b3">Nota 3:</label>
+        <input type="number" id="b3"><br>
+
+        <label for="b4">Nota 4:</label>
+        <input type="number" id="b4"><br>
+
+        <button onclick="registrarNotas()">Registrar Notas</button>
+    </div>
+
+    <h3>Estudantes Matriculados e Situação</h3>
+    <table border="1" id="tabelaEstudantes">
+        <thead>
+            <tr>
+                <th>Matrícula</th>
+                <th>Nome</th>
+                <th>Curso</th>
+                <th>Período</th>
+                <th>Situação</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dados dos estudantes serão inseridos aqui -->
+        </tbody>
+    </table>
+
+    <script>
+        class Estudante {
+            constructor(matricula, nome, curso, periodo) {
+                this.matricula = matricula;
+                this.nome = nome;
+                this.curso = curso;
+                this.periodo = periodo;
+                this.notas = null;
+            }
+
+            registrarNotas(b1, b2, b3, b4) {
+                this.notas = new Boletim(b1, b2, b3, b4);
+            }
+
+            obterSituação() {
+                return this.notas ? this.notas.situação : 'Não Registrado';
+            }
+        }
+
+        class Boletim {
+            constructor(b1, b2, b3, b4) {
+                this.b1 = b1;
+                this.b2 = b2;
+                this.b3 = b3;
+                this.b4 = b4;
+                this.situação = this.calcularSituação();
+            }
+
+            calcularSituação() {
+                const media = (this.b1 + this.b2 + this.b3 + this.b4) / 4;
+                if (media >= 6) {
+                    return 'Aprovado';
+                } else if (media >= 4) {
+                    return 'Prova Final';
+                } else {
+                    return 'Reprovado';
+                }
+            }
+        }
+
+        const estudantes = [];
+
+        function matricularEstudante() {
+            const matricula = document.getElementById('matricula').value;
+            const nome = document.getElementById('nome').value;
+            const curso = document.getElementById('curso').value;
+            const periodo = document.getElementById('periodo').value;
+
+            const estudante = new Estudante(matricula, nome, curso, periodo);
+            estudantes.push(estudante);
+
+            atualizarTabela();
+        }
+
+        function registrarNotas() {
+            const matricula = document.getElementById('matriculaNota').value;
+            const b1 = parseFloat(document.getElementById('b1').value);
+            const b2 = parseFloat(document.getElementById('b2').value);
+            const b3 = parseFloat(document.getElementById('b3').value);
+            const b4 = parseFloat(document.getElementById('b4').value);
+
+            const estudante = estudantes.find(est => est.matricula == matricula);
+            if (estudante) {
+                estudante.registrarNotas(b1, b2, b3, b4);
+                atualizarTabela();
+            } else {
+                alert('Estudante não encontrado!');
+            }
+        }
+
+        function atualizarTabela() {
+            const tabela = document.getElementById('tabelaEstudantes').getElementsByTagName('tbody')[0];
+            tabela.innerHTML = '';
+
+            estudantes.forEach(estudante => {
+                const row = tabela.insertRow();
+                row.innerHTML = `
+                    <td>${estudante.matricula}</td>
+                    <td>${estudante.nome}</td>
+                    <td>${estudante.curso}</td>
+                    <td>${estudante.periodo}</td>
+                    <td>${estudante.obterSituação()}</td>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>
